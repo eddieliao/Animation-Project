@@ -37,7 +37,7 @@ public class Main extends PApplet
 	{
 		// These numbers decide how big the window is.
 		// You can change these if you don't like the size!
-		size(640, 360);
+		size(1920, 1080);
 	}
 	
 	// Do any one-time initialization here, like initializing fields
@@ -56,7 +56,7 @@ public class Main extends PApplet
 		// Then call methods on g to draw stuff.  This is just an example,
 		// feel free to remove.  See the links at the top of this file
 		// for documentation on the drawing methods you can call on g
-		g.line(0, 0, g.width, g.height);
-		g.ellipse(20, 20, 20, 20);
+		g.rect(960, 540, 10, 10);
+		g.fill(0);
 	}
 }
