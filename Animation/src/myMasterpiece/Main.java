@@ -57,5 +57,6 @@ public class Main extends PApplet
 		// feel free to remove.  See the links at the top of this file
 		// for documentation on the drawing methods you can call on g
 		g.line(0, 0, g.width, g.height);
+		g.ellipse(20, 20, 20, 20);
 	}
 }
