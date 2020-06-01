@@ -44,6 +44,6 @@ public class Sprite {
 	
 	public void drawSprite()
 	{
-		g.
+		g.image(img, a, b);
 	}
 }
