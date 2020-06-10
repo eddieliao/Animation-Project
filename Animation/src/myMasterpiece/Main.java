@@ -5,6 +5,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 
 // Simplified docs: https://processing.org/reference/
 // JavaDocs: http://processing.github.io/processing-javadocs/core/
@@ -13,7 +14,9 @@ public class Main extends PApplet
 {
 	// Declare any private fields you need to help keep track of
 	// stuff while your masterpiece animates itself
-
+	
+	private Sprite sprite;
+	private PImage img;
 	public static void main(String[] args) 
 	{
 		// This string MUST match your package and class name
@@ -37,12 +40,14 @@ public class Main extends PApplet
 	{
 		// These numbers decide how big the window is.
 		// You can change these if you don't like the size!
-		size(1920, 1080);
+		size(600, 300);
 	}
 	
-	// Do any one-time initialization here, like initializing fields
+	// Do any one-time initialization here, like initializing fields	
 	public void setup()
 	{
+		sprite = new Sprite(g); 
+		img = loadImage("images/Left Stand.png");
 	}
 
 	// This gets called over and over again, once for each animation frame
@@ -51,12 +56,11 @@ public class Main extends PApplet
 		// Typically, you'll do something like this to clear the
 		// screen before drawing your frame.  Feel free to change
 		// the color.
-		g.background(255 /* red */ , 255 /* green */, 255 /* blue */);
+		g.background(0 /* red */ , 128 /* green */, 0/* blue */);
 
 		// Then call methods on g to draw stuff.  This is just an example,
 		// feel free to remove.  See the links at the top of this file
 		// for documentation on the drawing methods you can call on g
-		g.rect(960, 540, 10, 10);
-		g.fill(0);
+		g.image(img, 260, 100);
 	}
 }

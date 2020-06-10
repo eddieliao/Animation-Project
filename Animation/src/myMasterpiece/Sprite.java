@@ -2,48 +2,42 @@ package myMasterpiece;
 
 import java.awt.event.KeyEvent;
 
+import processing.core.PApplet;
 import processing.core.PGraphics;
+import processing.core.PImage;
 
-public class Sprite {
+public class Sprite extends PApplet{
 	
 	private PGraphics g;
 	private KeyEvent key;
-	private int x;
-	private int y;
+	private PImage img;
 	
-	public Sprite(PGraphics g, KeyEvent key, int x, int y)
+	public Sprite(PGraphics g)
 	{
 		this.g = g;
 		this.key = key;
-		this.x = x;
-		this.y = y;
+	}
+	
+	public void setup()
+	{
+		img = loadImage("/Animation/src/images/Left Stand.png");
 	}
 	
 	public void processMove()
-	{
-		if(key.getKeyCode() == KeyEvent.VK_W)
-		{
-			y++;
-		}
-		
+	{		
 		if(key.getKeyCode() == KeyEvent.VK_A)
 		{
-			x--;
+			img = loadImage("images/Left Stand.png");
 		}
-		
-		if(key.getKeyCode() == KeyEvent.VK_S)
-		{
-			y--;
-		}
-		
+
 		if(key.getKeyCode() == KeyEvent.VK_D)
 		{
-			x++;
+			img = loadImage("Right Stand.png");
 		}
 	}
 	
 	public void drawSprite()
 	{
-		g.image(img, a, b);
+		g.image(img, 0, 0);
 	}
 }
