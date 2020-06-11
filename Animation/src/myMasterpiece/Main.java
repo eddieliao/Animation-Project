@@ -37,11 +37,14 @@ public class Main extends PApplet
 	private PImage barOutline;
 	private PImage healthbar;
 	private PImage manabar;
+		
+	private PImage background;
 	
 	private char prevKey;
 	private int startMs;
 	private boolean attack;
 	private String prevDirection;
+	private int endLag;
 	
 	public static void main(String[] args) 
 	{
@@ -94,11 +97,14 @@ public class Main extends PApplet
 		healthbar = loadImage("images/Life Bar.png");
 		manabar = loadImage("images/Mana Bar.png");
 		
+		background = loadImage("images/Background.png");
+		
 		g.image(frontStand, 260, 100);
 		
 		startMs = millis();
 		attack = false;
 		prevDirection = "";
+		endLag = millis();
 	}
 
 	// This gets called over and over again, once for each animation frame
@@ -107,6 +113,9 @@ public class Main extends PApplet
 		frame.toFront();
 		
 		g.background(0 /* red */ , 128 /* green */, 0/* blue */);
+		
+		background.resize(0, 1500);
+		g.image(background, -18, -850);
 		
 		// Calculate Health and Mana before every drawBars
 		if (key == 'k') // Kill command
@@ -152,6 +161,7 @@ public class Main extends PApplet
 			
 			else
 			{
+				endLag = millis();
 				attack = false;
 			}
 		}
@@ -163,7 +173,7 @@ public class Main extends PApplet
 				sprite.buyShield();
 			}
 			
-			else if (key == 'j')
+			if (key == 'j' && millis() > endLag + 175)
 			{
 				startMs = millis();
 				if (prevKey == 'a')
