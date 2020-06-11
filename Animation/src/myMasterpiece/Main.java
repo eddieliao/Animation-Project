@@ -148,7 +148,7 @@ public class Main extends PApplet
 			noLoop();
 		}
 		
-		if (attack)
+		else if (attack)
 		{
 			if (millis() < startMs + 175)
 			{
