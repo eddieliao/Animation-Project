@@ -26,12 +26,14 @@ public class Main extends PApplet
 	private PImage leftDead;
 	private PImage leftHit;
 	private PImage leftAttack;
+	private PImage leftBlock;
 	
 	private PImage rightStand;
 	private PImage rightStandShield;
 	private PImage rightDead;
 	private PImage rightHit;
 	private PImage rightAttack;
+	private PImage rightBlock;
 	
 	private Bars bars;
 	private PImage barOutline;
@@ -43,6 +45,7 @@ public class Main extends PApplet
 	private char prevKey;
 	private int startMs;
 	private boolean attack;
+	private boolean block;
 	private String prevDirection;
 	private int endLag;
 	
@@ -86,12 +89,14 @@ public class Main extends PApplet
 		leftDead = loadImage("images/Left Dead.png");
 		leftHit = loadImage("images/Left Hit.png");
 		leftAttack = loadImage("images/Left Attack.png");
+		leftBlock = loadImage("images/Left Block.png");
 		
 		rightStand = loadImage("images/Right Stand.png");
 		rightStandShield = loadImage("images/Right Shield.png");
 		rightDead = loadImage("images/Right Dead.png");
 		rightHit = loadImage("images/Right Hit.png");
 		rightAttack = loadImage("images/Right Attack.png");
+		rightBlock = loadImage("images/Right Block.png");
 		
 		barOutline = loadImage("images/Bars.png");
 		healthbar = loadImage("images/Life Bar.png");
@@ -103,6 +108,7 @@ public class Main extends PApplet
 		
 		startMs = millis();
 		attack = false;
+		block = false;
 		prevDirection = "";
 		endLag = millis();
 	}
@@ -118,7 +124,7 @@ public class Main extends PApplet
 		g.image(background, -18, -850);
 		
 		// Calculate Health and Mana before every drawBars
-		if (key == 'k') // Kill command
+		if (key == 'x') // Kill command
 		{
 			bars.changeHealth(-20);
 		}
@@ -148,13 +154,13 @@ public class Main extends PApplet
 			{
 				if (prevDirection.equals("left"))
 				{
-					sprite.attackSprite(leftAttack, "left");
+					sprite.actionSprite(leftAttack, "left", "attack");
 					key = 'a';
 				}
 				
 				else if (prevDirection.equals("right"))
 				{
-					sprite.attackSprite(rightAttack, "right");
+					sprite.actionSprite(rightAttack, "right", "attack");
 					key = 'd';
 				}
 			}
@@ -163,6 +169,30 @@ public class Main extends PApplet
 			{
 				endLag = millis();
 				attack = false;
+			}
+		}
+		
+		else if (block)
+		{
+			if (millis() < startMs + 250)
+			{
+				if (prevDirection.equals("left"))
+				{
+					sprite.actionSprite(leftBlock, "left", "block");
+					key = 'a';
+				}
+				
+				else if (prevDirection.equals("right"))
+				{
+					sprite.actionSprite(rightBlock, "right", "block");
+					key = 'd';
+				}
+			}
+			
+			else
+			{
+				endLag = millis();
+				block = false;
 			}
 		}
 		
@@ -178,19 +208,38 @@ public class Main extends PApplet
 				startMs = millis();
 				if (prevKey == 'a')
 				{
-					sprite.attackSprite(leftAttack, "left");
+					sprite.actionSprite(leftAttack, "left", "attack");
 					prevDirection = "left";					
 				}
 					
 				else
 				{
-					sprite.attackSprite(rightAttack, "right");
+					sprite.actionSprite(rightAttack, "right", "attack");
 					prevDirection = "right";
 				}
 				
 				startMs = millis();
 				attack = true;
 					
+			}
+			
+			else if(key == 'k' && millis() > endLag + 250)
+			{
+				startMs = millis();
+				if (prevKey == 'a')
+				{
+					sprite.actionSprite(leftBlock, "left", "block");
+					prevDirection = "left";					
+				}
+					
+				else
+				{
+					sprite.actionSprite(rightBlock, "right", "block");
+					prevDirection = "right";
+				}
+				
+				startMs = millis();
+				block = true;
 			}
 			
 			else if (key == 'a' || keyCode == LEFT)

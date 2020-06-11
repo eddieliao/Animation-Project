@@ -29,16 +29,32 @@ public class Sprite{
 		g.image(sprite, 260, 120);
 	}
 	
-	public void attackSprite(PImage sprite, String direction)
+	public void actionSprite(PImage sprite, String direction, String action)
 	{
-		if (direction.equals("left"))
+		if (action.equals("attack"))
 		{
-			g.image(sprite, 225, 83);
+			if (direction.equals("left"))
+			{
+				g.image(sprite, 225, 83);
+			}
+			
+			else
+			{
+				g.image(sprite, 260, 83);
+			}
 		}
 		
-		else
+		else if (action.equals("block"))
 		{
-			g.image(sprite, 260, 83);
+			if (direction.equals("left"))
+			{
+				g.image(sprite, 260, 118);
+			}
+		
+			else
+			{
+				g.image(sprite, 260, 118);
+			}
 		}
 	}
 }
