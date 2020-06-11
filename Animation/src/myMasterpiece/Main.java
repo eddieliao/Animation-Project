@@ -6,6 +6,7 @@ import processing.core.PGraphics;
 import processing.core.PImage;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.nio.charset.Charset;
 
 // Simplified docs: https://processing.org/reference/
 // JavaDocs: http://processing.github.io/processing-javadocs/core/
@@ -22,14 +23,25 @@ public class Main extends PApplet
 	
 	private PImage leftStand;
 	private PImage leftStandShield;
+	private PImage leftDead;
+	private PImage leftHit;
+	private PImage leftAttack;
 	
 	private PImage rightStand;
 	private PImage rightStandShield;
+	private PImage rightDead;
+	private PImage rightHit;
+	private PImage rightAttack;
 	
 	private Bars bars;
 	private PImage barOutline;
 	private PImage healthbar;
 	private PImage manabar;
+	
+	private char prevKey;
+	private int startMs;
+	private boolean attack;
+	private String prevDirection;
 	
 	public static void main(String[] args) 
 	{
@@ -61,82 +73,156 @@ public class Main extends PApplet
 	public void setup()
 	{
 		sprite = new Sprite(g);
-		bars = new Bars(g, 100, 100);
+		bars = new Bars(g, 20, 0);
 		
 		frontStand = loadImage("images/Front Stand.png");
 		frontStandShield = loadImage("images/Front Block.png");
 		
 		leftStand = loadImage("images/Left Stand.png");
 		leftStandShield = loadImage("images/Left Shield.png");
+		leftDead = loadImage("images/Left Dead.png");
+		leftHit = loadImage("images/Left Hit.png");
+		leftAttack = loadImage("images/Left Attack.png");
 		
 		rightStand = loadImage("images/Right Stand.png");
 		rightStandShield = loadImage("images/Right Shield.png");
+		rightDead = loadImage("images/Right Dead.png");
+		rightHit = loadImage("images/Right Hit.png");
+		rightAttack = loadImage("images/Right Attack.png");
 		
 		barOutline = loadImage("images/Bars.png");
 		healthbar = loadImage("images/Life Bar.png");
 		manabar = loadImage("images/Mana Bar.png");
 		
 		g.image(frontStand, 260, 100);
+		
+		startMs = millis();
+		attack = false;
+		prevDirection = "";
 	}
 
 	// This gets called over and over again, once for each animation frame
 	public void draw() 
 	{
 		frame.toFront();
-		// Typically, you'll do something like this to clear the
-		// screen before drawing your frame.  Feel free to change
-		// the color.
+		
 		g.background(0 /* red */ , 128 /* green */, 0/* blue */);
 		
-		// Then call methods on g to draw stuff.  This is just an example,
-		// feel free to remove.  See the links at the top of this file
-		// for documentation on the drawing methods you can call on g
+		// Calculate Health and Mana before every drawBars
+		if (key == 'k') // Kill command
+		{
+			bars.changeHealth(-20);
+		}
 		
+		bars.calculateHealth();
+		bars.calculateMana();
 		bars.drawBars(barOutline, healthbar, manabar);
-		
-		if (key == 's')
+
+		if (bars.getHealth() <= 0)
 		{
-			sprite.buyShield();
-		}
-		
-		if (key == 'a' || keyCode == LEFT)
-		{
-			if (sprite.getShield())
-			{
-				sprite.drawSprite(leftStandShield);
+			if (prevKey == 'a')
+			{	
+				sprite.drawSprite(leftDead);
 			}
 			
 			else
 			{
-				sprite.drawSprite(leftStand);
+				sprite.drawSprite(rightDead);
 			}
-
+			
+			noLoop();
 		}
 		
-		else if (key == 'd' || keyCode == RIGHT)
+		if (attack)
 		{
-			if (sprite.getShield())
+			if (millis() < startMs + 175)
 			{
-				sprite.drawSprite(rightStandShield);
+				if (prevDirection.equals("left"))
+				{
+					sprite.attackSprite(leftAttack, "left");
+					key = 'a';
+				}
+				
+				else if (prevDirection.equals("right"))
+				{
+					sprite.attackSprite(rightAttack, "right");
+					key = 'd';
+				}
 			}
 			
 			else
 			{
-				sprite.drawSprite(rightStand);
+				attack = false;
 			}
-
 		}
 		
 		else
 		{
-			if (sprite.getShield())
+			if (key == 's')
 			{
-				sprite.drawSprite(frontStandShield);
+				sprite.buyShield();
+			}
+			
+			else if (key == 'j')
+			{
+				startMs = millis();
+				if (prevKey == 'a')
+				{
+					sprite.attackSprite(leftAttack, "left");
+					prevDirection = "left";					
+				}
+					
+				else
+				{
+					sprite.attackSprite(rightAttack, "right");
+					prevDirection = "right";
+				}
+				
+				startMs = millis();
+				attack = true;
+					
+			}
+			
+			else if (key == 'a' || keyCode == LEFT)
+			{	
+				prevKey = 'a';
+				if (sprite.getShield())
+				{
+					sprite.drawSprite(leftStandShield);
+				}
+				
+				else
+				{
+					sprite.drawSprite(leftStand);
+				}
+
+			}
+			
+			else if (key == 'd' || keyCode == RIGHT)
+			{
+				prevKey = 'd';
+				if (sprite.getShield())
+				{
+					sprite.drawSprite(rightStandShield);
+				}
+				
+				else
+				{
+					sprite.drawSprite(rightStand);
+				}
 			}
 			
 			else
 			{
-				sprite.drawSprite(frontStand);
+				if (sprite.getShield())
+				{
+					sprite.drawSprite(frontStandShield);
+				}
+				
+				else
+				{
+					sprite.drawSprite(frontStand);
+				}
 			}
 		}
 	}

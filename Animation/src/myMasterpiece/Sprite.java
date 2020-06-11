@@ -26,6 +26,19 @@ public class Sprite{
 	
 	public void drawSprite(PImage sprite)
 	{
-		g.image(sprite, 260, 100);
+		g.image(sprite, 260, 120);
+	}
+	
+	public void attackSprite(PImage sprite, String direction)
+	{
+		if (direction.equals("left"))
+		{
+			g.image(sprite, 225, 83);
+		}
+		
+		else
+		{
+			g.image(sprite, 260, 83);
+		}
 	}
 }
