@@ -35,6 +35,10 @@ public class Bars {
 	public void changeHealth(int num)
 	{
 		health = health + num;
+		if (health > 20)
+		{
+			health = 20;
+		}
 	}
 	
 	public int getHealth()
@@ -51,6 +55,10 @@ public class Bars {
 	public void changeMana(int num)
 	{
 		mana = mana + num;
+		if (mana > 100)
+		{
+			mana = 100;
+		}
 	}
 	
 	public int getMana()

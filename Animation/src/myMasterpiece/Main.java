@@ -2,6 +2,7 @@ package myMasterpiece;
 
 import java.util.ArrayList;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import java.awt.Color;
@@ -21,6 +22,8 @@ public class Main extends PApplet
 	private PImage frontStand;
 	private PImage frontStandShield;
 	
+	private PImage heal;
+	
 	private PImage leftStand;
 	private PImage leftStandShield;
 	private PImage leftDead;
@@ -38,19 +41,9 @@ public class Main extends PApplet
 	private ArrayList<Enemy> enemies;
 	
 	private PImage leftStandEnemy;
-	private PImage leftAttack1Enemy;
-	private PImage leftAttack2Enemy;
-	private PImage leftAttack3Enemy;
-	private PImage leftAttack4Enemy;
-	private PImage leftAttack5Enemy;
 	private ArrayList<PImage> leftAttackArray; 
 	
 	private PImage rightStandEnemy;
-	private PImage rightAttack1Enemy;
-	private PImage rightAttack2Enemy;
-	private PImage rightAttack3Enemy;
-	private PImage rightAttack4Enemy;
-	private PImage rightAttack5Enemy;
 	private ArrayList<PImage> rightAttackArray;
 	
 	private Bars bars;
@@ -64,12 +57,18 @@ public class Main extends PApplet
 	private int startMs;
 	private boolean attack;
 	private boolean block;
+	private boolean healCheck;
+	private boolean leftHitCheck;
+	private boolean rightHitCheck;
 	private String prevDirection;
 	private int endLag;
 	
 	private int enemyMs;
 	private int enemyAttackMs;
 	private int enemyEndlagMs;
+	
+	private PFont font;
+	private Counter counter;
 	
 	public static void main(String[] args) 
 	{
@@ -103,6 +102,11 @@ public class Main extends PApplet
 		sprite = new Sprite(g);
 		bars = new Bars(g, 20, 0);
 		
+//		String[] fontList = PFont.list();
+//		printArray(fontList);
+		font = createFont("fonts/Teletactile-3zavL.ttf", 20);
+		counter = new Counter(g, font);
+		
 		enemies = new ArrayList<Enemy>();
 		for (int count = 0; count < 10; count ++)
 		{
@@ -123,6 +127,8 @@ public class Main extends PApplet
 		frontStand = loadImage("images/Front Stand.png");
 		frontStandShield = loadImage("images/Front Block.png");
 		
+		heal = loadImage("images/Heal.png");
+		
 		leftStand = loadImage("images/Left Stand.png");
 		leftStandShield = loadImage("images/Left Shield.png");
 		leftDead = loadImage("images/Left Dead.png");
@@ -138,11 +144,6 @@ public class Main extends PApplet
 		rightBlock = loadImage("images/Right Block.png");
 		
 		leftStandEnemy = loadImage("enemyImages/Left Stand.png");
-		leftAttack1Enemy = loadImage("enemyImages/Left Attack 1.png");
-		leftAttack2Enemy = loadImage("enemyImages/Left Attack 2.png");
-		leftAttack3Enemy = loadImage("enemyImages/Left Attack 3.png");
-		leftAttack4Enemy = loadImage("enemyImages/Left Attack 4.png");
-		leftAttack5Enemy = loadImage("enemyImages/Left Attack 5.png");
 		
 		leftAttackArray = new ArrayList<PImage>();
 		
@@ -152,11 +153,6 @@ public class Main extends PApplet
 		}
 		
 		rightStandEnemy = loadImage("enemyImages/Right Stand.png");
-		rightAttack1Enemy = loadImage("enemyImages/Right Attack 1.png");
-		rightAttack2Enemy = loadImage("enemyImages/Right Attack 2.png");
-		rightAttack3Enemy = loadImage("enemyImages/Right Attack 3.png");
-		rightAttack4Enemy = loadImage("enemyImages/Right Attack 4.png");
-		rightAttack5Enemy = loadImage("enemyImages/Right Attack 5.png");
 		
 		rightAttackArray = new ArrayList<PImage>();
 		
@@ -176,6 +172,9 @@ public class Main extends PApplet
 		startMs = millis();
 		attack = false;
 		block = false;
+		healCheck = false;
+		leftHitCheck = false;
+		rightHitCheck = false;
 		prevDirection = "";
 		endLag = millis();
 		
@@ -194,10 +193,17 @@ public class Main extends PApplet
 		background.resize(0, 1500);
 		g.image(background, -18, -850);
 		
+		counter.displayScore();
+		
 		// Calculate Health and Mana before every drawBars
 		if (key == 'x') // Kill command
 		{
 			bars.changeHealth(-20);
+		}
+		
+		if (key == 'z') // Fill mana command
+		{
+			bars.changeMana(100);
 		}
 		
 		bars.calculateHealth();
@@ -227,12 +233,66 @@ public class Main extends PApplet
 				{
 					sprite.actionSprite(leftAttack, "left", "attack");
 					key = 'a';
+					
+					for (int count = 0; count < 10; count ++)
+					{
+						if (enemies.get(count).getSide().equals("left") && enemies.get(count).getPos() > 195)
+						{
+							enemies.remove(count);
+							double rand = Math.random();
+							if (rand < 0.5)
+							{
+								int x = -50;
+								enemies.add(new Enemy(g, "left", x));
+							}
+							
+							else
+							{
+								int x = 600;
+								enemies.add(new Enemy(g, "right", x));
+							}
+							
+							if (bars.getMana() < 100)
+							{
+								bars.changeMana(3);
+							}
+							
+							counter.changeScore(5);
+						}
+					}
 				}
 				
 				else if (prevDirection.equals("right"))
 				{
 					sprite.actionSprite(rightAttack, "right", "attack");
 					key = 'd';
+					
+					for (int count = 0; count < 10; count ++)
+					{
+						if (enemies.get(count).getSide().equals("right") && enemies.get(count).getPos() < 315)
+						{
+							enemies.remove(count);
+							double rand = Math.random();
+							if (rand < 0.5)
+							{
+								int x = -50;
+								enemies.add(new Enemy(g, "left", x));
+							}
+							
+							else
+							{
+								int x = 600;
+								enemies.add(new Enemy(g, "right", x));
+							}
+							
+							if (bars.getMana() < 100)
+							{
+								bars.changeMana(3);
+							}
+							
+							counter.changeScore(5);
+						}
+					}
 				}
 			}
 			
@@ -267,6 +327,45 @@ public class Main extends PApplet
 			}
 		}
 		
+		else if (healCheck)
+		{
+			if (millis() < startMs + 150)
+			{
+				sprite.healSprite(heal);
+			}
+			
+			else
+			{
+				healCheck = false;
+			}
+		}
+		
+		else if (leftHitCheck)
+		{
+			if (millis() < startMs + 200)
+			{
+				sprite.actionSprite(leftHit, "left", "hit");
+			}
+			
+			else
+			{
+				leftHitCheck = false;
+			}
+		}
+		
+		else if (rightHitCheck)
+		{
+			if (millis() < startMs + 200)
+			{
+				sprite.actionSprite(rightHit, "right", "hit");
+			}
+			
+			else
+			{
+				rightHitCheck = false;
+			}
+		}
+		
 		else
 		{
 			if (key == 's')
@@ -294,23 +393,24 @@ public class Main extends PApplet
 					
 			}
 			
-			else if(key == 'k' && millis() > endLag + 250)
+			else if(key == 'k' && millis() > endLag + 250 && sprite.getShield())
 			{
 				startMs = millis();
 				if (prevKey == 'a')
 				{
 					sprite.actionSprite(leftBlock, "left", "block");
-					prevDirection = "left";					
+					prevDirection = "left";	
+					sprite.changeLeftBlock(true);
 				}
 					
 				else
 				{
 					sprite.actionSprite(rightBlock, "right", "block");
 					prevDirection = "right";
+					sprite.changeRightBlock(true);
 				}
 				
 				startMs = millis();
-				block = true;
 			}
 			
 			else if (key == 'a' || keyCode == LEFT)
@@ -324,6 +424,7 @@ public class Main extends PApplet
 				else
 				{
 					sprite.drawSprite(leftStand);
+					sprite.changeLeftBlock(false);
 				}
 
 			}
@@ -339,7 +440,18 @@ public class Main extends PApplet
 				else
 				{
 					sprite.drawSprite(rightStand);
+					sprite.changeRightBlock(false);
 				}
+			}
+			
+			else if (key == 'l' && bars.getMana() == 100)
+			{
+				startMs = millis();
+				key = prevKey;
+				sprite.healSprite(heal);
+				bars.changeHealth(5);
+				bars.changeMana(-100);
+				healCheck = true;
 			}
 			
 			else
@@ -377,9 +489,9 @@ public class Main extends PApplet
 				{
 					if(enemy.getPos() > 195)
 					{
-						if (millis() < enemy.getEndlagMs() + 2000)
+						if (millis() < enemy.getEndlagMs() + 2500)
 						{
-							System.out.println("Ms: " + millis());
+//							System.out.println("Ms: " + millis());
 							enemy.changePos(0);
 							enemy.changeMs(millis());
 							enemy.drawSprite(leftStandEnemy);
@@ -392,7 +504,16 @@ public class Main extends PApplet
 								enemy.changeAttackCount(-5);
 								enemy.changeAttackMs(millis() + 50);
 								enemy.changeEndlagMs(millis());
-								System.out.println("Endlag: " + enemy.getEndlagMs());
+								
+								if (sprite.getLeftBlock() == false || sprite.getShield() == false)
+								{
+									bars.changeHealth(-1);
+									sprite.drawSprite(leftHit);
+									leftHitCheck = true;
+									startMs = millis();
+									counter.changeScore(-1);
+								}
+//								System.out.println("Endlag: " + enemy.getEndlagMs());
 							}
 							
 							else if (millis() > enemy.getAttackMs() + 50)
@@ -426,18 +547,59 @@ public class Main extends PApplet
 					
 				else
 				{
-					if(enemy.getPos() < 315)
+					if (enemy.getPos() < 315)
 					{
-						enemy.changePos(0);
-						enemy.changeMs(millis());
-						enemy.drawSprite(leftStandEnemy);
-					}
+						if (millis() < enemy.getEndlagMs() + 2500)
+						{
+//							System.out.println("Ms: " + millis());
+							enemy.changePos(0);
+							enemy.changeMs(millis());
+							enemy.drawSprite(rightStandEnemy);
+						}
 						
+						else
+						{
+							if (enemy.getAttackCount() >= 4)
+							{
+								enemy.changeAttackCount(-5);
+								enemy.changeAttackMs(millis() + 50);
+								enemy.changeEndlagMs(millis());
+								if (sprite.getRightBlock() == false || sprite.getShield() == false)
+								{
+									bars.changeHealth(-1);
+									sprite.drawSprite(rightHit);
+									rightHitCheck = true;
+									startMs = millis();
+									counter.changeScore(-1);
+								}
+//								System.out.println("Endlag: " + enemy.getEndlagMs());
+							}
+							
+							else if (millis() > enemy.getAttackMs() + 50)
+							{
+								enemy.changeAttackCount(1);
+								if (enemy.getAttackCount() < 4)
+								{
+									enemy.drawSprite(rightAttackArray.get(enemy.getAttackCount()));
+									enemy.changeAttackMs(millis());
+								}
+							}
+							
+							else
+							{
+								if (enemy.getAttackCount() > -1)
+								{
+									enemy.drawSprite(rightAttackArray.get(enemy.getAttackCount()));	
+								}
+							}
+						}
+					}
+					
 					else
 					{
 						enemy.changePos(-30);
 						enemy.changeMs(millis());
-						enemy.drawSprite(leftStandEnemy);	
+						enemy.drawSprite(rightStandEnemy);	
 					}
 				}
 			}
