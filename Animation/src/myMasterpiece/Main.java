@@ -181,6 +181,13 @@ public class Main extends PApplet
 		enemyMs = millis();
 		enemyAttackMs = millis();
 		enemyEndlagMs = millis();
+		
+		System.out.println("Controls: J - Attack");
+		System.out.println("          K - Block (when shield is equipped)");
+		System.out.println("          L - Heal (when mana bar is full)");
+		System.out.println("          S - Equip Shield");
+		System.out.println("          <- or A - Left");
+		System.out.println("          -> or D - Right");
 	}
 
 	// This gets called over and over again, once for each animation frame
