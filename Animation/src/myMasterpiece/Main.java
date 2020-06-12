@@ -35,6 +35,24 @@ public class Main extends PApplet
 	private PImage rightAttack;
 	private PImage rightBlock;
 	
+	private ArrayList<Enemy> enemies;
+	
+	private PImage leftStandEnemy;
+	private PImage leftAttack1Enemy;
+	private PImage leftAttack2Enemy;
+	private PImage leftAttack3Enemy;
+	private PImage leftAttack4Enemy;
+	private PImage leftAttack5Enemy;
+	private ArrayList<PImage> leftAttackArray; 
+	
+	private PImage rightStandEnemy;
+	private PImage rightAttack1Enemy;
+	private PImage rightAttack2Enemy;
+	private PImage rightAttack3Enemy;
+	private PImage rightAttack4Enemy;
+	private PImage rightAttack5Enemy;
+	private ArrayList<PImage> rightAttackArray;
+	
 	private Bars bars;
 	private PImage barOutline;
 	private PImage healthbar;
@@ -48,6 +66,10 @@ public class Main extends PApplet
 	private boolean block;
 	private String prevDirection;
 	private int endLag;
+	
+	private int enemyMs;
+	private int enemyAttackMs;
+	private int enemyEndlagMs;
 	
 	public static void main(String[] args) 
 	{
@@ -81,6 +103,23 @@ public class Main extends PApplet
 		sprite = new Sprite(g);
 		bars = new Bars(g, 20, 0);
 		
+		enemies = new ArrayList<Enemy>();
+		for (int count = 0; count < 10; count ++)
+		{
+			double rand = Math.random();
+			if (rand < 0.5)
+			{
+				int x = -50 + (-120 * count);
+				enemies.add(new Enemy(g, "left", x));
+			}
+			
+			else
+			{
+				int x = 600 + (120 * count);
+				enemies.add(new Enemy(g, "right", x));
+			}
+		}
+		
 		frontStand = loadImage("images/Front Stand.png");
 		frontStandShield = loadImage("images/Front Block.png");
 		
@@ -98,6 +137,34 @@ public class Main extends PApplet
 		rightAttack = loadImage("images/Right Attack.png");
 		rightBlock = loadImage("images/Right Block.png");
 		
+		leftStandEnemy = loadImage("enemyImages/Left Stand.png");
+		leftAttack1Enemy = loadImage("enemyImages/Left Attack 1.png");
+		leftAttack2Enemy = loadImage("enemyImages/Left Attack 2.png");
+		leftAttack3Enemy = loadImage("enemyImages/Left Attack 3.png");
+		leftAttack4Enemy = loadImage("enemyImages/Left Attack 4.png");
+		leftAttack5Enemy = loadImage("enemyImages/Left Attack 5.png");
+		
+		leftAttackArray = new ArrayList<PImage>();
+		
+		for (int count = 1; count < 6; count++)
+		{
+			leftAttackArray.add(loadImage("enemyImages/Left Attack " + count + ".png"));
+		}
+		
+		rightStandEnemy = loadImage("enemyImages/Right Stand.png");
+		rightAttack1Enemy = loadImage("enemyImages/Right Attack 1.png");
+		rightAttack2Enemy = loadImage("enemyImages/Right Attack 2.png");
+		rightAttack3Enemy = loadImage("enemyImages/Right Attack 3.png");
+		rightAttack4Enemy = loadImage("enemyImages/Right Attack 4.png");
+		rightAttack5Enemy = loadImage("enemyImages/Right Attack 5.png");
+		
+		rightAttackArray = new ArrayList<PImage>();
+		
+		for (int count = 1; count < 6; count++)
+		{
+			rightAttackArray.add(loadImage("enemyImages/Right Attack " + count + ".png"));
+		}
+		
 		barOutline = loadImage("images/Bars.png");
 		healthbar = loadImage("images/Life Bar.png");
 		manabar = loadImage("images/Mana Bar.png");
@@ -111,6 +178,10 @@ public class Main extends PApplet
 		block = false;
 		prevDirection = "";
 		endLag = millis();
+		
+		enemyMs = millis();
+		enemyAttackMs = millis();
+		enemyEndlagMs = millis();
 	}
 
 	// This gets called over and over again, once for each animation frame
@@ -281,6 +352,93 @@ public class Main extends PApplet
 				else
 				{
 					sprite.drawSprite(frontStand);
+				}
+			}
+		}
+		
+		for (Enemy enemy : enemies)
+		{
+			if (millis() < enemy.getMs() + 600)
+			{
+				if (enemy.getSide().equals("left"))
+				{
+					enemy.drawSprite(leftStandEnemy);
+				}
+				
+				else
+				{
+					enemy.drawSprite(rightStandEnemy);
+				}
+			}
+			
+			else
+			{
+				if (enemy.getSide().equals("left"))
+				{
+					if(enemy.getPos() > 195)
+					{
+						if (millis() < enemy.getEndlagMs() + 2000)
+						{
+							System.out.println("Ms: " + millis());
+							enemy.changePos(0);
+							enemy.changeMs(millis());
+							enemy.drawSprite(leftStandEnemy);
+						}
+						
+						else
+						{
+							if (enemy.getAttackCount() >= 4)
+							{
+								enemy.changeAttackCount(-5);
+								enemy.changeAttackMs(millis() + 50);
+								enemy.changeEndlagMs(millis());
+								System.out.println("Endlag: " + enemy.getEndlagMs());
+							}
+							
+							else if (millis() > enemy.getAttackMs() + 50)
+							{
+								enemy.changeAttackCount(1);
+								if (enemy.getAttackCount() < 4)
+								{
+									enemy.drawSprite(leftAttackArray.get(enemy.getAttackCount()));
+									enemy.changeAttackMs(millis());
+								}
+							}
+							
+							else
+							{
+								if (enemy.getAttackCount() > -1)
+								{
+									enemy.drawSprite(leftAttackArray.get(enemy.getAttackCount()));	
+								}
+							}
+						}
+					}
+						
+					else
+					{
+						enemy.changePos(30);
+						enemy.changeMs(millis());
+						enemy.drawSprite(leftStandEnemy);	
+					}
+
+				}
+					
+				else
+				{
+					if(enemy.getPos() < 315)
+					{
+						enemy.changePos(0);
+						enemy.changeMs(millis());
+						enemy.drawSprite(leftStandEnemy);
+					}
+						
+					else
+					{
+						enemy.changePos(-30);
+						enemy.changeMs(millis());
+						enemy.drawSprite(leftStandEnemy);	
+					}
 				}
 			}
 		}
